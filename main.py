@@ -2,7 +2,9 @@ import discord
 from discord.ext import commands
 from dotenv import load_dotenv
 
-load_dotenv()
+TOKEN = ''
+load_dotenv(override=True)
+
 
 START = 994992781535744121
 END   = 994992814637199380
@@ -11,8 +13,6 @@ BTN_CHANNEL = 995018477704327248
 LOG_CHANNEL = 995023454451536082
 
 PARTY_EMOJI = {"Labour": " <:labour:313396345119571968>","Coalition!": " <:Coalition:986324142854918195>"}
-
-
 
 intents = discord.Intents.default()
 intents.message_content = True
