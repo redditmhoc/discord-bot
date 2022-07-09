@@ -1,16 +1,14 @@
 import discord
 from discord.ext import commands
-from dotenv import load_dotenv
+from dotenv import dotenv_values
 
-TOKEN = ''
-load_dotenv(override=True)
+config = dotenv_values(".env")
 
+print(config)
 
-START = 994992781535744121
-END   = 994992814637199380
-
-BTN_CHANNEL = 995018477704327248
-LOG_CHANNEL = 995023454451536082
+TOKEN = config["TOKEN"]
+BTN_CHANNEL = int(config["BTN_CHANNEL"])
+LOG_CHANNEL = int(config["LOG_CHANNEL"])
 
 PARTY_EMOJI = {"Labour": " <:labour:313396345119571968>","Coalition!": " <:Coalition:986324142854918195>"}
 
@@ -34,15 +32,23 @@ def is_bot(m):
 
 async def get_roles(g = discord.guild):
     roles = []
+    start_role, end_role = await get_positional_role(g, True), await get_positional_role(g, False)
     for r in g.roles:
         greater, lesser = False, False
-        if r > g.get_role(START):
+        if r > end_role:
             greater = True
-        if r < g.get_role(END):
+        if r < start_role:
             lesser = True
         if greater and lesser:
             roles.append(r)
     return roles
+
+async def get_positional_role(g = discord.guild, start = True):
+    if start:
+        name = "== START =="
+    else:
+        name = "== END =="
+    return discord.utils.get(g.roles, name=name)
 
 @bot.command()
 async def partyroles(ctx):
@@ -70,16 +76,7 @@ class Buttons(discord.ui.View):
         print(super().is_persistent())
     @discord.ui.button(custom_id="select-role-button",label="Change your party role",style=discord.ButtonStyle.primary,emoji="😃")
     async def change_role_button(self,interaction:discord.Interaction,button:discord.ui.Button):
-        roles = []
-        g = interaction.guild
-        for r in g.roles:
-            greater, lesser = False, False
-            if r > g.get_role(START):
-                greater = True
-            if r < g.get_role(END):
-                lesser = True
-            if greater and lesser:
-                roles.append(r)
+        roles = await get_roles(g=interaction.guild)
         embed=discord.Embed(title="Change your party role", description="Select the correct party role with the dropdown below.", color=0x2b823d)
         await interaction.response.send_message(embed=embed, view=SelectView(roles=roles),ephemeral=True)
 
