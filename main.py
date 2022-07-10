@@ -115,7 +115,7 @@ class PartySelect(discord.ui.Select):
 
 
 class SelectView(discord.ui.View):
-    def __init__(self, *, timeout = 3, roles = []):
+    def __init__(self, *, timeout = 30, roles = []):
         super().__init__(timeout=timeout)
         self.add_item(PartySelect(roles=roles))
     async def on_timeout(self):
